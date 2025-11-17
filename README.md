@@ -1,103 +1,132 @@
 # Infrastructure
-🚀 مجموعه‌ای از راهکارهای زیرساختی برای افزایش عملکرد، مقیاس‌پذیری و پایداری سیستم
+�<div align="center">
 
-این ریپازیتوری مجموعه‌ای از الگوها، تنظیمات و راهکارهای عملی برای بهینه‌سازی زیرساخت در محیط‌های Production است. هدف این پروژه ارائه‌ی یک مرجع کامل برای طراحی و ساخت سیستم‌هایی است که سریع‌تر، پایدارتر و مقیاس‌پذیرتر عمل کنند؛ چه در معماری‌های Monolith و چه Microservices.
+<h1>🚀 مجموعه‌ای از راهکارهای زیرساختی</h1>
 
-این مجموعه مناسب تیم‌های DevOps، SRE، Backend و کسانی است که به دنبال افزایش قابلیت اتکا و کارایی سیستم‌ها هستند.
+<h3>برای افزایش عملکرد، مقیاس‌پذیری و پایداری سیستم</h3>
 
-🎯 اهداف پروژه
+<br/>
 
-بهبود عملکرد (Performance Optimization)
+<img src="https://img.shields.io/badge/Infrastructure-Optimization-blueviolet?style=for-the-badge">
+<img src="https://img.shields.io/badge/High%20Performance-Systems-orange?style=for-the-badge">
+<img src="https://img.shields.io/badge/DevOps-SRE-0A66C2?style=for-the-badge">
+<img src="https://img.shields.io/badge/Production-Ready-success?style=for-the-badge">
 
-افزایش ظرفیت پاسخ‌گویی (High Concurrency Readiness)
+<br/><br/>
 
-ارتقای مقیاس‌پذیری (Horizontal & Vertical Scalability)
+<p align="center">
+مجموعه‌ای کامل از راهکارها، الگوها و تنظیمات زیرساختی برای ساخت سیستم‌هایی سریع‌تر، پایدارتر و مقیاس‌پذیرتر.<br>
+این پروژه مناسب تیم‌های <b>DevOps</b>، <b>SRE</b> و <b>Backend</b> است.
+</p>
 
-افزایش پایداری سرویس‌ها (Reliability & Fault-Tolerance)
+</div>
 
-کاهش سربار منابع (Resource Efficiency)
+---
 
-استانداردسازی تنظیمات در زیرساخت
+<br/>
 
-ارائه الگوهای واقعی و قابل استقرار برای Production
+## 🎯 اهداف پروژه
 
-⚙️ حوزه‌های پوشش داده شده
-🔹 1. بهینه‌سازی سیستم‌عامل (OS-Level Optimization)
+<div align="center">
 
-تنظیمات شبکه (TCP Stack)
+<table>
+<tr>
+<td>⚡ بهبود Performance</td>
+<td>📈 افزایش High Concurrency</td>
+<td>🌐 مقیاس‌پذیری افقی/عمودی</td>
+</tr>
+<tr>
+<td>🛡️ پایداری سرویس‌ها</td>
+<td>🔧 کاهش مصرف منابع</td>
+<td>📚 استانداردسازی زیرساخت</td>
+</tr>
+</table>
 
-افزایش ظرفیت کانکشن‌ها
+</div>
 
-مدیریت صف‌های سیستم
+---
 
-کاهش Latency
+<br/>
 
-مدیریت file descriptors
+# ⚙️ حوزه‌های پوشش داده‌شده
 
-غیرفعال‌سازی Swap در محیط‌های حساس
+## 🔹 1. بهینه‌سازی سیستم‌عامل (OS-Level Optimization)
 
-🔹 2. مدیریت منابع (Resource Planning & Sizing)
+<ul>
+<li>تنظیمات Kernel و TCP Stack</li>
+<li>افزایش ظرفیت کانکشن‌ها و صف‌ها</li>
+<li>کاهش Latency و بهبود throughput</li>
+<li>تنظیم file descriptors</li>
+<li>غیرفعال‌سازی Swap در محیط Production</li>
+</ul>
 
-نحوه تخصیص CPU، RAM، حافظه و I/O
+---
 
-روش‌های Capacity Planning
+## 🔹 2. مدیریت منابع (Resource Planning & Sizing)
 
-مدل‌های برآورد برای بارهای پیش‌بینی‌شده
+<ul>
+<li>مدل‌های Capacity Planning</li>
+<li>برآورد CPU / RAM / I/O برای سرویس‌ها</li>
+<li>بهینه‌سازی تخصیص منابع در محیط‌های واقعی</li>
+</ul>
 
-🔹 3. معماری و طراحی زیرساخت (Infrastructure Architecture)
+---
 
-الگوهای High Availability
+## 🔹 3. معماری و طراحی زیرساخت (Infrastructure Architecture)
 
-Load Balancing (L4/L7)
+<ul>
+<li>الگوهای High Availability</li>
+<li>Load Balancing لایه 4 و 7</li>
+<li>Failover و Redundancy</li>
+<li>Service Hardening</li>
+<li>طراحی Logging استاندارد</li>
+</ul>
 
-Failover و Redundancy
+---
 
-Service Hardening
+## 🔹 4. Observability & Monitoring
 
-Logging استاندارد
+<ul>
+<li>طراحی Metrics مهم</li>
+<li>Alerting با اهمیت بالا</li>
+<li>Logging Pipeline استاندارد</li>
+<li>Distributed Tracing با OTel / Jaeger</li>
+<li>Grafana + Prometheus داشبوردهای</li>
+</ul>
 
-🔹 4. Observability و Monitoring
+---
 
-طراحی Metricها
+## 🔹 5. بهینه‌سازی سرویس‌ها (Application-Level Optimization)
 
-Alerting
+<ul>
+<li>Connection Pooling</li>
+<li>Cache Layer Design</li>
+<li>Retry & Backoff Pattern</li>
+<li>Circuit Breaker</li>
+<li>رفتار سرویس در High Load</li>
+</ul>
 
-Logging Pipeline
+---
 
-Distributed Tracing (OTel, Jaeger, Zipkin)
+## 🔹 6. تست فشار و تست تحمل (Load & Stress Testing)
 
-Dashboards (Grafana/Prometheus)
+<ul>
+<li>استفاده از ابزارهای ab / hey / h2load / k6</li>
+<li>طراحی سناریوهای واقعی</li>
+<li>اندازه‌گیری RPS / Latency / Throughput</li>
+<li>تحلیل Bottleneck و گلوگاه‌ها</li>
+</ul>
 
-🔹 5. بهینه‌سازی سرویس‌ها (Application-Level Optimization)
+---
 
-Connection Pooling
+## 🔹 7. امنیت زیرساخت (Security Hardening)
 
-Cache Layer Design
+<ul>
+<li>Kernel Hardening</li>
+<li>Network Security</li>
+<li>Access Policy Design</li>
+<li>TLS/SSL Management</li>
+<li>محافظت در برابر حملات DoS</li>
+</ul>
 
-Retry Patterns
-
-Circuit Breaker
-
-رفتار سرویس در High Load
-
-🔹 6. تست فشار و قابلیت تحمل (Load & Stress Testing)
-
-استفاده از ab, hey, h2load, k6
-
-سناریوهای تست بار واقعي
-
-اندازه‌گیری RPS, Latency, Throughput
-
-تحلیل Bottleneckها
-
-🔹 7. امنیت در زیرساخت (Security Hardening)
-
-Kernel Hardening
-
-Network Hardening
-
-Access Policies
-
-مدیریت TLS/SSL
-
-جلوگیری از حملات DoS در لایه زیرساخت
+---
