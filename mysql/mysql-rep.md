@@ -1,27 +1,32 @@
-MySQL 5.6 Replication Setup
-Region: 10.75
-Architecture: Master (192.168.0.99) → Forward (10.75.0.18) → Replica (172.17.9.9 Docker)
-📌 سناریو
+# MySQL 5.6 Replication Setup
 
-Master DB: 192.168.0.99
+## Region: 10.75  
+**Architecture:**  
+Master (192.168.0.99) → Forward (10.75.0.18) → Replica (172.17.9.9 Docker)
 
-Forward Server: 10.75.0.18
+---
 
-Replica Server: 172.17.9.9
+## 📌 Scenario
 
-MySQL Version: 5.6 (Docker)
+- **Master DB:** `192.168.0.99`
+- **Forward Server:** `10.75.0.18`
+- **Replica Server:** `172.17.9.9`
+- **MySQL Version:** 5.6 (Docker)
+- Each Docker container = One Replica per region
 
-هر کانتینر = یک Replica برای هر منطقه
+---
 
-🧱 مرحله 1 — Port Forward روی 10.75
+# 🧱 Step 1 — Port Forward on 10.75
 
-روی سرور 10.75.0.18:
+On server `10.75.0.18`:
 
-نصب socat
+## Install socat
+
+```bash
 sudo apt install socat -y
-اجرای Forward
+Run Forward
 sudo socat TCP-LISTEN:3306,fork,reuseaddr TCP:192.168.0.99:3306
-تبدیل به سرویس systemd
+Create systemd Service
 sudo nano /etc/systemd/system/mysql3306-forward.service
 [Unit]
 Description=Forward 3306 -> 192.168.0.99:3306
@@ -36,24 +41,22 @@ WantedBy=multi-user.target
 sudo systemctl daemon-reload
 sudo systemctl enable mysql3306-forward
 sudo systemctl start mysql3306-forward
-🔐 محدود کردن دسترسی پورت 3306
+🔐 Restrict Port 3306 Access
 
-فقط اجازه به Replica (172.17.9.9):
+Allow only Replica (172.17.9.9):
 
 sudo iptables -I INPUT 1 -p tcp -s 172.17.9.9 --dport 3306 -j ACCEPT
 sudo iptables -A INPUT -p tcp --dport 3306 -j DROP
-
-Persist:
-
+Persist Rules
 sudo apt install iptables-persistent -y
 sudo netfilter-persistent save
-🐳 مرحله 2 — راه‌اندازی Docker Replica روی 172.17.9.9
-ساخت مسیر دیتا روی 10TB
+🐳 Step 2 — Setup Docker Replica on 172.17.9.9
+Create Data Directory (10TB Storage)
 sudo mkdir -p /data-mysql/replicate-10-75
 sudo chown -R 999:999 /data-mysql
 docker-compose.yml
 
-مسیر:
+Path:
 
 /data-mysql/replicate-10-75/docker-compose.yml
 version: '3.8'
@@ -70,9 +73,9 @@ services:
       - ./conf:/etc/mysql/conf.d
     ports:
       - "3307:3306"
-تنظیمات MySQL Replica
+Replica MySQL Configuration
 
-مسیر:
+Path:
 
 /data-mysql/replicate-10-75/conf/my.cnf
 [mysqld]
@@ -81,40 +84,43 @@ relay-log=relay-bin
 log-bin=mysql-bin
 read_only=1
 skip-name-resolve=1
-اجرای کانتینر
+Start Container
 cd /data-mysql/replicate-10-75
 docker compose up -d
-📦 مرحله 3 — Restore Backup
-Extract
+📦 Step 3 — Restore Backup
+Extract Backup
 cd /data-mysql/replicate-10-75/backup
 tar -xzf 23-6a1f43e4bbf689311cd7c204c337cf0c.tar.gz
-ساخت دیتابیس‌ها
+Create Databases
 docker exec -it replicate-10-75 mysql -uroot -p'6taK..@213' -e "
 CREATE DATABASE IF NOT EXISTS anbar;
 CREATE DATABASE IF NOT EXISTS baskool;
 CREATE DATABASE IF NOT EXISTS tranzit;
 "
-Import موازی (8 Thread)
+Parallel Import (8 Threads)
 cd /data-mysql/replicate-10-75/backup/2026/02/23/Mysql
 
 ls backup_*.sql.gz | xargs -P8 -I{} bash -c '
   db=$(echo "{}" | sed -E "s/^backup_(.*)\.sql\.gz$/\1/")
   gunzip -c "{}" | docker exec -i replicate-10-75 mysql -uroot -p"6taK..@213" "$db"
 '
-🔑 مرحله 4 — ساخت User Replication روی Master (192.168.0.99)
+🔑 Step 4 — Create Replication User on Master
+
+On 192.168.0.99:
+
 CREATE USER 'repl'@'192.168.0.%' IDENTIFIED BY 'replpass';
 GRANT REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'repl'@'192.168.0.%';
 FLUSH PRIVILEGES;
-🔍 بررسی Master
+Check Master Status
 SHOW MASTER STATUS;
 
-مثال:
+Example:
 
-mysql-bin.010857
+File: mysql-bin.010857
 Position: 383147024
-🔗 مرحله 5 — اتصال Replica به Master
+🔗 Step 5 — Connect Replica to Master
 
-روی Replica:
+On Replica:
 
 docker exec -it replicate-10-75 mysql -uroot -p'6taK..@213'
 STOP SLAVE;
@@ -128,60 +134,47 @@ CHANGE MASTER TO
   MASTER_LOG_POS=383147024;
 
 START SLAVE;
-✅ بررسی وضعیت Replication
+✅ Verify Replication Status
 docker exec -it replicate-10-75 mysql -uroot -p'6taK..@213' -e "SHOW SLAVE STATUS\G"
 
-باید:
+Expected:
 
 Slave_IO_Running: Yes
 Slave_SQL_Running: Yes
 Seconds_Behind_Master: 0
-🧨 رفع خطای Table doesn't exist
+🧨 Fix "Table doesn't exist" Error
 
-اگر دیدی:
+If you see:
 
 Last_SQL_Error: Table 'tranzit.SodurePateDarbeKhoruj' doesn't exist
-راه درست:
-
-روی Master:
-
+On Master:
 mysqldump -u root -p --single-transaction tranzit SodurePateDarbeKhoruj | gzip > table.sql.gz
-
-روی Replica:
-
+On Replica:
 gunzip -c table.sql.gz | docker exec -i replicate-10-75 mysql -uroot -p'6taK..@213' tranzit
 
-بعد:
+Then:
 
 START SLAVE SQL_THREAD;
-🧪 تست نهایی Replication
-
-روی Master:
-
+🧪 Final Replication Test
+On Master:
 INSERT INTO test.repl_check VALUES (1);
-
-روی Replica:
-
+On Replica:
 SELECT * FROM test.repl_check;
-📊 وضعیت سالم Replication
-
-روی Master:
-
+📊 Healthy Replication Indicators
+On Master:
 SHOW PROCESSLIST;
 
-باید:
+Should show:
 
 User: repl
 Command: Binlog Dump
-
-روی Replica:
-
+On Replica:
 Slave_IO_State: Waiting for master to send event
 Slave_IO_Running: Yes
 Slave_SQL_Running: Yes
-🏁 نتیجه نهایی
+🏁 Final Result
 
-Replica منطقه 10.75 با ویژگی‌های زیر عملیاتی شد:
+Region 10.75 Replica is fully operational with:
 
 Docker-based MySQL 5.6
 
@@ -189,8 +182,8 @@ Dedicated 10TB Storage
 
 Port Forward via socat
 
-Firewall restricted access
+Firewall Restricted Access
 
 Parallel Restore
 
-Live Replication active
+Live Replication Active
